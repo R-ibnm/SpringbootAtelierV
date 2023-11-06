@@ -1,14 +1,14 @@
 version: '3'
 services:
-  # React App Service
+  # React
   react-app:
     image: rimibnm/img_react
     ports:
       - "3000:3000"
 
-  # Spring Boot App Service
+  # Spring Boot
   spring-app:
-    image: rimibnm/img_springbootateliervoiture
+    image: rimibnm/img_backendvoiture
     ports:
       - "8081:8081"
     depends_on:
@@ -16,7 +16,7 @@ services:
     networks:
       - my-network
 
-  # PostgreSQL Service
+  # PostgreSQL
   postgres:
     image: postgres
     environment:
