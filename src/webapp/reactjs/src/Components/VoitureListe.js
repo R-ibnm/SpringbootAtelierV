@@ -42,8 +42,11 @@ export default class VoitureListe extends Component {
         });
     }
     deleteVoiture = (voitureId) => {
+        console.log("Deleting voiture with ID:", voitureId);
+        const url = "http://localhost:8081/api/voitures/" + voitureId;
+        console.log("DELETE URL:", url);
         axios
-            .delete("http://localhost:8081/api/voitures/" + voitureId)
+            .delete(url)
             .then((response) => {
                 if (response.status === 200) {
                     this.setState({ show: true });

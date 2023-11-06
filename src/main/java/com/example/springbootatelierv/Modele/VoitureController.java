@@ -1,36 +1,41 @@
 package com.example.springbootatelierv.Modele;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/voitures")
 public class VoitureController {
     @Autowired
-    private VoitureRepo voitureRepo;
-    @Autowired
-    private ProprietaireRepo proprietaireRepo;
-    @CrossOrigin(origins = "http://localhost:3000")
-    @RequestMapping("/voitures")
-    public Iterable<Voiture> getVoitures(){
-        return voitureRepo.findAll();
+    private VoitureService voitureService;
+
+    @GetMapping(path = "")
+    public List<Voiture> getAllVoitures() {
+        return voitureService.getAllVoitures();
     }
 
-    public Voiture saveVoiture(Voiture voiture) {
-        try {
-            Voiture savedVoiture = voitureRepo.save(voiture);
-            return savedVoiture;
-        } catch (Exception e) {
-            throw e; }
+    @GetMapping(path = "/{id}")
+    public Voiture getVoitureById(Integer id) {
+        return voitureService.getVoitureById(id);
     }
 
-    public Proprietaire saveProprietaire(Proprietaire proprietaire) {
-        try {
-            Proprietaire savedProprietaire = proprietaireRepo.save(proprietaire);
-            return savedProprietaire;
-        } catch (Exception e) {
-            throw e;  }
+    @PostMapping(path = "")
+    public Voiture addVoiture(@RequestBody Voiture voiture) {
+        return voitureService.addVoiture(voiture);
     }
 
+    @PutMapping(path = "")
+    public Voiture updateVoiture(@RequestBody Voiture voiture) {
+        return voitureService.updateVoiture(voiture);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public void deleteVoiture(@PathVariable Integer id) {
+        voitureService.deleteVoiture(id);
+    }
 }
+

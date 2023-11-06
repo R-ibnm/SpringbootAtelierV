@@ -21,7 +21,6 @@ function App() {
                             <Route path="/add" exact component={Voiture} />
                             <Route path="/edit/:id" exact component={Voiture} />
                             <Route path="/list" exact component={VoitureListe} />
-
                         </Switch>
                     </Col>
                 </Row>

@@ -7,6 +7,5 @@ import java.util.List;
 
 @RepositoryRestResource
 public interface VoitureRepo extends CrudRepository<Voiture, Integer> {
-    List<Voiture> findByModele(@Param("modele") String modele);
-    List<Voiture> findByCouleur(@Param("couleur") String couleur);
+    List<Voiture> findAll();
 }
