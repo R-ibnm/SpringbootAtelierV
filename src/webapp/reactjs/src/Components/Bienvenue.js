@@ -10,7 +10,7 @@ class Bienvenue extends React.Component {
                     <p>
                         Le meilleur de nos voitures est exposé près de chez vous
                     </p>
-                    <footer className="blockquote-footer">IDSIT FullStack TP</footer>
+                    <footer className="blockquote-footer">IDSIT FullStack TP_Rim</footer>
                 </blockquote>
             </Jumbotron>
         );

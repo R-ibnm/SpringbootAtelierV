@@ -12,54 +12,51 @@ export default class VoitureListe extends Component {
         super(props);
         this.state = {
             voitures: [],
-            show : false,
+            show: false,
         };
     }
     componentDidMount() {
         axios
             .get("http://localhost:8081/api/voitures")
-            .then((response) => response.data._embedded.voitures)
-            .then((data) => {
+            .then((response) => {
+                const data = response.data._embedded.voitures.map((voiture) => {
+                    const id = parseInt(voiture._links.self.href.split('/').pop(), 10);
+                    return {
+                        ...voiture,
+                        id: id
+                    };
+                });
                 this.setState({ voitures: data });
-                this.loadProprietaireInfo(data);
                 console.log(data);
             })
             .catch((error) => {
                 console.error("Erreur lors de la récupération des données : ", error);
             });
     }
-    loadProprietaireInfo(voitures) {
-        voitures.forEach((voiture) => {
-            axios.get(voiture._links.proprietaire.href)
-                .then((response) => response.data)
-                .then((proprietaire) => {
-                    voiture.proprietaire = proprietaire;
-                    this.setState({ voitures: this.state.voitures });
+
+
+    deleteVoiture = (voitureId) => {
+        if(voitureId){
+            axios
+                .delete("http://localhost:8081/api/voitures/" + voitureId)
+                .then((response) => {
+                    if (response.status === 200) {
+                        this.setState({ show: true });
+                        setTimeout(() => this.setState({ show: false }), 3000);
+                        this.setState({
+                            voitures: this.state.voitures.filter(
+                                (voiture) => voiture.id !== voitureId
+                            ),
+                        });
+                    } else {
+                        // Gérer l'erreur ici
+                        console.error("Erreur lors de la suppression de la voiture.");
+                    }
                 })
                 .catch((error) => {
-                    console.error("Erreur lors de la récupération des données du propriétaire : ", error);
+                    console.error("Erreur lors de la suppression de la voiture : ", error);
                 });
-        });
-    }
-    deleteVoiture = (voitureId) => {
-        console.log("Deleting voiture with ID:", voitureId);
-        const url = "http://localhost:8081/api/voitures/" + voitureId;
-        console.log("DELETE URL:", url);
-        axios
-            .delete(url)
-            .then((response) => {
-                if (response.status === 200) {
-                    this.setState({ show: true });
-                    setTimeout(() => this.setState({ show: false }), 3000);
-                    this.setState({
-                        voitures: this.state.voitures.filter(
-                            (voiture) => voiture.id !== voitureId
-                        ),
-                    });
-                } else {
-                    this.setState({ show: false });
-                }
-            });
+        }
     };
     render() {
         return (
@@ -73,8 +70,11 @@ export default class VoitureListe extends Component {
                         }}
                     />
                 </div>
-                <Card.Header>
-                    <FontAwesomeIcon icon={faList} /> Liste Voitures
+                <Card.Header className="d-flex justify-content-between">
+                    <h5><FontAwesomeIcon icon={faList} /> Liste Voitures </h5>
+                    <Link to={"add"}>
+                        <Button variant="success">Ajouter Voiture</Button>
+                    </Link>
                 </Card.Header>
                 <Card.Body>
                     <Table bordered hover striped variant="dark">
@@ -98,6 +98,7 @@ export default class VoitureListe extends Component {
                         ) : (
                             this.state.voitures.map((voiture) => (
                                 <tr key={voiture.id}>
+
                                     <td>{voiture.marque}</td>
                                     <td>{voiture.modele}</td>
                                     <td>{voiture.couleur}</td>
@@ -105,12 +106,14 @@ export default class VoitureListe extends Component {
                                     <td>{voiture.annee}</td>
                                     <td>{voiture.prix}</td>
 
+
                                     <td>
                                         <ButtonGroup>
                                             <Link to={"edit/" + voiture.id}>
                                                 <Button
                                                     size="sm"
                                                     variant="outline-primary"
+                                                    className="mr-2"
                                                 >
                                                     <FontAwesomeIcon
                                                         icon={faEdit}
@@ -120,10 +123,13 @@ export default class VoitureListe extends Component {
                                             <Button
                                                 size="sm"
                                                 variant="outline-danger"
-                                                onClick={this.deleteVoiture.bind(
-                                                    this,
-                                                    voiture.id
-                                                )}
+                                                onClick={() => {
+                                                    if (voiture.id) {
+                                                        this.deleteVoiture(voiture.id);
+                                                    } else {
+                                                        console.error("ID de la voiture non valide : ", voiture.id);
+                                                    }
+                                                }}
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faTrash}

@@ -8,11 +8,9 @@ import {
     faPlusSquare,
     faSave,
     faUndo,
-}
-from "@fortawesome/free-solid-svg-icons";
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import CustomToast from "./myToast";
-
 export default class Voiture extends Component {
     constructor(props) {
         super(props);
@@ -35,33 +33,78 @@ export default class Voiture extends Component {
         immatricule: "",
         annee: "",
         prix: "",
-
     };
     resetVoiture = () => {
         this.setState(() => this.initialState);
     };
+
+    componentDidMount() {
+        const voitureId = this.props.match.params.id;
+        if (voitureId) {
+            // En mode édition, récupérer les informations de la voiture
+            axios
+                .get(`http://localhost:8081/api/voitures/${voitureId}`)
+                .then((response) => {
+                    const voitureData = response.data;
+                    this.setState({
+                        marque: voitureData.marque,
+                        modele: voitureData.modele,
+                        couleur: voitureData.couleur,
+                        immatricule: voitureData.immatricule,
+                        annee: voitureData.annee,
+                        prix: voitureData.prix,
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération des données : ", error);
+                });
+        }
+    }
+
     submitVoiture(event) {
         event.preventDefault();
+
         const voiture = {
             marque: this.state.marque,
             modele: this.state.modele,
             couleur: this.state.couleur,
             immatricule: this.state.immatricule,
             annee: this.state.annee,
-            prix: this.state.prix,
+            prix: this.state.prix
         };
 
-        axios.post("http://localhost:8081/api/voitures", voiture)
-            .then((voitureResponse) => {
-                if (voitureResponse.data != null) {
-                    this.setState(this.initialState);
-                    this.setState({
-                        show: true,
-                    });
+        const voitureId = this.props.match.params.id;
 
-                    setTimeout(() => this.setState({ show: false }), 3000);
-                }
-            });
+        if (voitureId) {
+            // En mode édition, effectuer une requête PUT pour mettre à jour les informations de la voiture
+            axios
+                .put(`http://localhost:8080/api/voitures/${voitureId}`, voiture)
+                .then((voitureResponse) => {
+                    if (voitureResponse.data != null) {
+                        this.setState({
+                            show: true,
+                        });
+                        setTimeout(() => this.setState({ show: false }), 3000);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la mise à jour de la voiture : ", error);
+                });
+        }else{
+            axios.post("http://localhost:8080/api/voitures", voiture)
+                .then((voitureResponse) => {
+                    if (voitureResponse.data != null) {
+                        this.setState(this.initialState);
+                        this.setState({
+                            show: true,
+                        });
+                        setTimeout(() => this.setState({ show: false }), 3000);
+                    }
+                });
+        }
+
+
+
     }
     voitureChange(event) {
         this.setState({
@@ -70,30 +113,27 @@ export default class Voiture extends Component {
     }
     render() {
         return (
-            <Card className={"border border-dark bg-dark text-white"}>
-                <div style={{"display":this.state.show ? "block":"none"}}>
+            <Card className={"border border-dark bg-dark text-white"} >
+                <div style={{ display: this.state.show ? "block" : "none" }}>
                     <CustomToast
                         children={{
                             show: this.state.show,
-                            message: "Voiture ajouter avec succes.",
+                            message: "Voiture ajoutée avec succès.",
                             type: "success",
                         }}
                     />
                 </div>
-                <Card.Header>
-                    <FontAwesomeIcon icon={faPlusSquare} /> Ajouter Voiture
+                <Card.Header style={{  textAlign: 'center' }}>
+                    <h4 style={{ color: 'white' }}>Ajouter une nouvelle voiture</h4>
                 </Card.Header>
-                <Card.Body>
-                    <Form
-                        onSubmit={this.submitVoiture}
-                        onReset={this.resetVoiture}
-                        id="VoitureFormId"
-                    >
-                        <Card.Body>
-                            <Row>
 
-                                <Form.Group as={Col} controlId="fromGridMarque">
-                                    <Form.Label> Marque </Form.Label>{" "}
+
+                <Card.Body>
+                    <Form onSubmit={this.submitVoiture} onReset={this.resetVoiture} id="VoitureFormId">
+                        <Row>
+                            <Col sm={6} className="mb-3">
+                                <Form.Group controlId="formGridMarque" >
+                                    <Form.Label> Marque </Form.Label>
                                     <Form.Control
                                         name="marque"
                                         type="text"
@@ -105,8 +145,10 @@ export default class Voiture extends Component {
                                         autoComplete="off"
                                     />
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="fromGridMarque">
-                                    <Form.Label> Modele </Form.Label>{" "}
+                            </Col>
+                            <Col sm={6} className="mb-3">
+                                <Form.Group controlId="formGridModele">
+                                    <Form.Label> Modele </Form.Label>
                                     <Form.Control
                                         name="modele"
                                         type="text"
@@ -117,8 +159,10 @@ export default class Voiture extends Component {
                                         autoComplete="off"
                                     />
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="fromGridMarque">
-                                    <Form.Label> Couleur </Form.Label>{" "}
+                            </Col>
+                            <Col sm={6} className="mb-3">
+                                <Form.Group controlId="formGridCouleur">
+                                    <Form.Label> Couleur </Form.Label>
                                     <Form.Control
                                         name="couleur"
                                         type="text"
@@ -129,8 +173,10 @@ export default class Voiture extends Component {
                                         autoComplete="off"
                                     />
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="fromGridMarque">
-                                    <Form.Label> Immatricule </Form.Label>{" "}
+                            </Col>
+                            <Col sm={6} className="mb-3">
+                                <Form.Group controlId="formGridImmatricule">
+                                    <Form.Label> Immatricule </Form.Label>
                                     <Form.Control
                                         name="immatricule"
                                         type="text"
@@ -141,8 +187,10 @@ export default class Voiture extends Component {
                                         autoComplete="off"
                                     />
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="fromGridMarque">
-                                    <Form.Label> Prix </Form.Label>{" "}
+                            </Col>
+                            <Col sm={6} className="mb-3">
+                                <Form.Group controlId="formGridPrix">
+                                    <Form.Label> Prix </Form.Label>
                                     <Form.Control
                                         name="prix"
                                         type="text"
@@ -153,28 +201,28 @@ export default class Voiture extends Component {
                                         autoComplete="off"
                                     />
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="fromGridMarque">
-                                    <Form.Label> Annee </Form.Label>{" "}
+                            </Col>
+                            <Col sm={6} className="mb-3">
+                                <Form.Group controlId="formGridAnnee">
+                                    <Form.Label> Année </Form.Label>
                                     <Form.Control
                                         name="annee"
                                         type="text"
                                         className={"bg-dark text-white"}
-                                        placeholder="Entrez Annee Voiture"
+                                        placeholder="Entrez Année Voiture"
                                         value={this.state.annee}
                                         onChange={this.voitureChange}
                                         autoComplete="off"
                                     />
                                 </Form.Group>
-                            </Row>
-                        </Card.Body>
-                        <Card.Footer style={{ textAlign: "right" }}>
-                            <Button size="sm" variant="success" type="submit">
-                                <FontAwesomeIcon icon={faSave} /> Submit
-                            </Button>
-                            <Button size="sm" variant="info" type="reset">
-                                <FontAwesomeIcon icon={faUndo} /> Reset
-                            </Button>
-                        </Card.Footer>
+                            </Col>
+                        </Row>
+                        <Button size="sm" variant="success" type="submit" className="mr-3">
+                            <FontAwesomeIcon icon={faSave} /> Submit
+                        </Button>
+                        <Button size="sm" variant="info" type="reset">
+                            <FontAwesomeIcon icon={faUndo} /> Reset
+                        </Button>
                     </Form>
                 </Card.Body>
             </Card>

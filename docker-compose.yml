@@ -1,0 +1,32 @@
+version: '3'
+services:
+  # React App Service
+  react-app:
+    image: rimibnm/img_react
+    ports:
+      - "3000:3000"
+
+  # Spring Boot App Service
+  spring-app:
+    image: rimibnm/img_springbootateliervoiture
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    networks:
+      - my-network
+
+  # PostgreSQL Service
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: R.ibnM1308
+      POSTGRES_DB: springboot
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+
+networks:
+  my-network:
