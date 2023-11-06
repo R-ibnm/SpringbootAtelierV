@@ -16,15 +16,16 @@ services:
     networks:
       - my-network
 
-  # PostgreSQL
-  postgres:
-    image: postgres
+  # MySQL Service
+  mysql:
+    image: mysql
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: R.ibnM1308
-      POSTGRES_DB: springboot
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fullstack
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
     networks:
       - my-network
 
